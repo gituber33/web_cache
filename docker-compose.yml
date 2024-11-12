@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000"
+    environment:
+      - FLASK_ENV=development  # Configure Flask pour le développement
+    volumes:
+      - ./app:/app  # Montre le répertoire local ./app dans le conteneur
+    depends_on:
+      - selenium
+    restart: always # Redémarre le conteneur sauf s'il a été arrêté manuellement
+    networks:
+      - web-cache  # Connecte ce service au réseau web-cache
+
+  selenium:
+    image: selenium/standalone-chrome  # Image Selenium avec Chrome
+    container_name: selenium-chrome  # Nom du conteneur (facultatif)
+    ports:
+      - "4444"
+    volumes:
+      - /dev/shm:/dev/shm  # Monte /dev/shm pour améliorer les performances de Chrome
+    restart: always  # Redémarre le conteneur automatiquement en cas de panne
+    networks:
+      - web-cache  # Attache le conteneur au réseau web-cache
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: always
+    depends_on:
+      - web
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx_conf/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - web-cache
+
+networks:
+  web-cache:
+    driver: bridge
