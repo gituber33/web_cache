@@ -1,7 +1,8 @@
 events {
     worker_connections 1024;  # Nombre maximal de connexions simultanées pa>}
 http {
-    # Définition de la zone de cache en mémoire (zone partagée entre les wo>    proxy_cache_path /tmp/cache levels=1:2 keys_zone=flask_cache:10m max_si>
+    # Définition de la zone de cache en mémoire (zone partagée entre les wo>    
+    proxy_cache_path /tmp/cache levels=1:2 keys_zone=flask_cache:10m max_si>
 
     server {
         listen 8080;
@@ -14,7 +15,8 @@ http {
             proxy_cache_key $scheme$host$uri;
             proxy_cache_valid 200 15s;  # Cache les réponses 200
             proxy_cache_valid 404 30s;  # Cache les réponses 404
-            proxy_cache_use_stale error timeout updating;  # Utiliser les r>            add_header X-Cache-Status $upstream_cache_status;
+            proxy_cache_use_stale error timeout updating;  # Utiliser les r>            
+            add_header X-Cache-Status $upstream_cache_status;
         }
         location / {
             proxy_pass http://web:5000;
